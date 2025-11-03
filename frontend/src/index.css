@@ -18,9 +18,9 @@
     --popover: 250 100% 99%;
     --popover-foreground: 240 15% 15%;
 
-    /* Primary */
-    /* Tím */
-    --primary: 271 79% 47%;
+  /* Primary */
+  /* Set primary to the blue used in --gradient-blue */
+  --primary: 223 100% 59%;
     --primary-foreground: 210 40% 96.1%; /*slate-100*/
     /* Hồng */
     --primary-glow: 320 100% 70%;
@@ -91,10 +91,10 @@
     );
 
     /* pattern craft */
-    --gradient-purple: radial-gradient(
+    --gradient-blue: radial-gradient(
       125% 125% at 50% 10%,
       hsla(0, 0%, 100%, 1) 40%,
-      hsla(262, 83%, 58%, 0.5) 100%
+      hsla(223, 100%, 59%, 0.5) 100%
     );
 
     /* Shadows */
@@ -135,7 +135,7 @@
     --popover: 240 15% 12%;
     --popover-foreground: 250 100% 95%;
 
-    --primary: 280 100% 70%;
+  --primary: 223 100% 59%;
     --primary-foreground: 240 15% 8%;
     --primary-glow: 320 100% 80%;
 
@@ -263,8 +263,8 @@
     background: var(--gradient-glass);
   }
 
-  .bg-gradient-purple {
-    background: var(--gradient-purple);
+  .bg-gradient-blue {
+    background: var(--gradient-blue);
   }
 
   /* Shadows */
