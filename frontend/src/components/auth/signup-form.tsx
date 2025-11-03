@@ -6,6 +6,8 @@ import { Button } from "../ui/button";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useNavigate } from "react-router";
 
 const signUpSchema = z
   .object({
@@ -26,6 +28,8 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const {signUp} = useAuthStore();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -34,10 +38,13 @@ export function SignupForm({
     resolver: zodResolver(signUpSchema),
   });
 
-  const onSubmit = (data: SignUpFormValues) => {
+  const onSubmit = async (data: SignUpFormValues) => {
+    const { fullname, username, email, password } = data;
+
     // TODO: Call API to register user
-    // For now, log the data (remove in production)
-    console.log("Sign up data:", data);
+    await signUp(username, password, email, fullname);
+
+    navigate("/signin");
   };
 
   return (

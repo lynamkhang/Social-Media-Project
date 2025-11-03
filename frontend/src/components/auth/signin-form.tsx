@@ -6,6 +6,8 @@ import { Button } from "../ui/button";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useNavigate } from "react-router";
 
 const signInSchema = z.object({
   identifier: z.string().min(1, "Vui lòng nhập email hoặc tên đăng nhập"),
@@ -18,6 +20,8 @@ export function SigninForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { signIn } = useAuthStore();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -26,9 +30,12 @@ export function SigninForm({
     resolver: zodResolver(signInSchema),
   });
 
-  const onSubmit = (data: SignInFormValues) => {
-    // TODO: Call API to sign user in
-    console.log("Sign in data:", data);
+  const onSubmit = async (data: SignInFormValues) => {
+    const { identifier, password } = data;
+
+    await signIn(identifier, password);
+
+    navigate("/");
   };
 
   return (

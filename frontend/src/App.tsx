@@ -3,6 +3,7 @@ import SigninPage from './pages/SigninPage';
 import SignupPage from './pages/SignupPage';
 import ChatPage from './pages/ChatPage';
 import {Toaster} from 'sonner';
+import HomePage from './pages/HomePage';
 
 function App() {
 
@@ -22,6 +23,10 @@ function App() {
             element={<SignupPage/>}
           />
           {/* protected routes */}
+          <Route
+            path='/'
+            element={<HomePage/>}
+          />
           <Route
             path='/chat'
             element={<ChatPage/>}
