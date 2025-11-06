@@ -1,7 +1,15 @@
-const HomePage = () => {
-  return (
-    <div>HomePage</div>
-  )
-}
+import Signout from "@/components/auth/signout";
+import { useAuthStore } from "@/stores/useAuthStore";
 
-export default HomePage
+const HomePage = () => {
+  const user = useAuthStore((s) => s.user);
+
+  return (
+    <div>
+      {user?.username}
+      <Signout />
+    </div>
+  );
+};
+
+export default HomePage;

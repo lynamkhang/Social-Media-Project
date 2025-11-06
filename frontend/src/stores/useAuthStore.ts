@@ -35,6 +35,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { accessToken } = await authService.signIn(identifier, password);
       set({ accessToken });
 
+      await get().fetchMe();
+
       toast.success("Đăng nhập thành công!");
     } catch (error) {
       console.error("Sign in error:", error);
@@ -52,6 +54,38 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error("Sign out error:", error);
       toast.error("Đăng xuất thất bại. Vui lòng thử lại.");
+    }
+  },
+
+  fetchMe: async () => {
+    try {
+      set({ loading: true });
+      const user = await authService.fetchMe();
+      set({ user });
+    } catch (error) {
+      console.error("Fetch me error:", error);
+      set({ user: null, accessToken: null });
+      toast.error("Error fetching user data.");
+    } finally {
+      set({ loading: false });
+    }
+  },
+  refresh: async () => {
+    try {
+      set({ loading: true });
+      const { user, fetchMe } = get();
+      const accessToken = await authService.refresh();
+      set({ accessToken });
+
+      if (!user) {
+        await fetchMe();
+      }
+    } catch (error) {
+      console.error("Refresh token error:", error);
+      toast.error("Session expired. Please sign in again.");
+      get().clearState();
+    } finally {
+      set({ loading: false });
     }
   },
 }));
