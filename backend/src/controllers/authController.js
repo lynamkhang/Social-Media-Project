@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import Session from "../models/Session.js";
 
-const ACCESS_TOKEN_TTL = "30m";
-const REFHESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; //14 days
+const ACCESS_TOKEN_TTL = "15m";
+const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; //14 days
 
 export const signUp = async (req, res) => {
   try {
@@ -18,7 +18,7 @@ export const signUp = async (req, res) => {
     }
 
     const existingUser = await User.findOne({
-      or: [{ email }, { username }],
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
@@ -96,7 +96,7 @@ export const signIn = async (req, res) => {
     await Session.create({
       userId: user._id,
       refreshToken,
-      expiresAt: new Date(Date.now() + REFHESH_TOKEN_TTL),
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
     });
 
     //return refresh token to cookie
@@ -104,7 +104,7 @@ export const signIn = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: REFHESH_TOKEN_TTL,
+      maxAge: REFRESH_TOKEN_TTL,
     });
 
     //return access token to res
@@ -137,37 +137,29 @@ export const signOut = async (req, res) => {
   }
 };
 
-//Create access token using refresh token
 export const refreshToken = async (req, res) => {
   try {
-    //Get refresh token from cookie
     const token = req.cookies?.refreshToken;
-
     if (!token) {
-      return res.status(401).json({ message: "No refresh token provided" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    //Compare with token in session
     const session = await Session.findOne({ refreshToken: token });
 
     if (!session) {
-      return res.status(403).json({ message: "Invalid refresh token" });
+      return res.status(403).json({ message: "Token not valid or expires" });
     }
 
-    //Check if token is expired
     if (session.expiresAt < new Date()) {
-      return res.status(403).json({ message: "Refresh token has expired" });
+      return res.status(403).json({ message: "Token expires" });
     }
+
     //Create new access token
     const accessToken = jwt.sign(
-      {
-        userId: session.userId,
-      },
+      { userId: session.userId },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL }
     );
-
-    //Return access token
     return res.status(200).json({ accessToken });
   } catch (error) {
     console.error("Error when calling refreshToken", error);

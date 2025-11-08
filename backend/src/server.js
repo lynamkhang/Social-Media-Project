@@ -14,11 +14,11 @@ const PORT = process.env.PORT || 5001;
 
 //middlewares
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 //public routes
 app.use("/api/auth", authRoute);
-app.use(cookieParser());
 
 //private route
 app.use(protectedRoute);
