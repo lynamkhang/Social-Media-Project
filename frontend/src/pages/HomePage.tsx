@@ -1,13 +1,11 @@
-import Signout from "@/components/auth/Signout";
-import { useAuthStore } from "@/stores/useAuthStore";
+//import Signout from "@/components/auth/Signout";
+//import { useAuthStore } from "@/stores/useAuthStore";
+import Layout from "@/components/layout/Layout";
 
 const HomePage = () => {
-  const user = useAuthStore((s) => s.user);
-
   return (
     <div>
-      {user?.username}
-      <Signout />
+      <Layout />
     </div>
   );
 };
