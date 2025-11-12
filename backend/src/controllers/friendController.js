@@ -1,7 +1,6 @@
 import Friend from "../models/Friend.js";
 import User from "../models/User.js";
 import FriendRequest from "../models/FriendRequest.js";
-import { populate } from "dotenv";
 
 export const sendFriendRequest = async (req, res) => {
   try {

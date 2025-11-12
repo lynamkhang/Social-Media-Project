@@ -1,22 +1,32 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       required: true,
       index: true,
     },
     caption: {
       type: String,
-      required: true,
-      maxlength: 2000,
+      default: "",
     },
-    mediaUrls: [{ type: String }], // Array of CDN links
+    mediaUrls: {
+      type: [String],
+      default: [],
+    },
     mediaType: {
       type: String,
-      enum: ["image", "video"],
+      enum: ["image", "video", "mixed"],
+      required: true,
+    },
+    location: {
+      type: Object,
+      default: null,
+    },
+    tags: {
+      type: [String],
+      default: [],
     },
     likesCount: {
       type: Number,
@@ -32,7 +42,8 @@ const postSchema = new mongoose.Schema(
     },
     visibility: {
       type: String,
-      enum: ["public", "friends", "private"],
+      enum: ["public", "private", "friends"],
+      default: "public",
     },
     isArchived: {
       type: Boolean,
@@ -40,8 +51,14 @@ const postSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // This creates createdAt and updatedAt automatically
   }
 );
-const Post = mongoose.model("Post", postSchema);
+
+// Indexes for performance
+postSchema.index({ userId: 1, createdAt: -1 });
+postSchema.index({ tags: 1 });
+postSchema.index({ visibility: 1, createdAt: -1 });
+
+const Post = new mongoose.model("Post", postSchema);
 export default Post;
