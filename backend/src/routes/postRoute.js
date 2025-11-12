@@ -4,16 +4,18 @@ import {
   deletePost,
   updatePost,
   getPosts,
-} from "../controllers/postController";
+} from "../controllers/postController.js";
+import upload from "../middlewares/multer.js";
 
 const router = express.Router();
 
-router.post("/posts", createPost);
+// Create post with multiple file uploads (max 10 files)
+router.post("/", upload.array("media", 10), createPost);
 
-router.put("/posts/:postId/update", updatePost);
+router.put("/:postId/update", updatePost);
 
-router.delete("/post/:postId/delete", deletePost);
+router.delete("/:postId/delete", deletePost);
 
-router.get("/posts", getPosts);
+router.get("/", getPosts);
 
 export default router;
