@@ -77,6 +77,32 @@ export const createPost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
   try {
+    const { postId } = req.params;
+    const { caption, location, tags, visibility } = req.body;
+    const userId = req.user._id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ message: "Không tìm thấy bài đăng" });
+    }
+
+    if (post.userId.toString() !== userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền chỉnh sửa bài đăng" });
+    }
+
+    if (caption !== undefined) post.caption = caption;
+    if (location !== undefined) post.location = location;
+    if (tags !== undefined) post.tags = tags;
+    if (visibility !== undefined) post.visibility = visibility;
+
+    await post.save();
+
+    return res
+      .status(200)
+      .json({ message: "Đã chỉnh sửa bài đăng thành công", post });
   } catch (error) {
     console.log("Error when update post", error);
     return res.status(500).json({ message: "System error" });
@@ -85,6 +111,37 @@ export const updatePost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   try {
+    const { postId } = req.params;
+    const userId = req.user._id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ message: "Không tìm thấy bài đăng" });
+    }
+
+    if (post.userId.toString() !== userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền xóa bài đăng" });
+    }
+
+    const mediaEntries = await PostMedia.find({ postId });
+
+    const deletePromises = mediaEntries.map((media) => {
+      const publicId = media.metadata.publicId;
+      return cloudinary.uploader.destroy(publicId, {
+        resource_type: media.mediaType,
+      });
+    });
+
+    await Promise.all(deletePromises);
+
+    await PostMedia.deleteMany({ postId });
+
+    await Post.findByIdAndDelete(postId);
+
+    return res.status(200).json({ message: "Đã xóa bài đăng thành công" });
   } catch (error) {
     console.log("Error when delete post", error);
     return res.status(500).json({ message: "System error" });
