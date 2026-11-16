@@ -21,7 +21,7 @@ export const sendFriendRequest = async (req, res) => {
     }
 
     let userA = from.toString();
-    let userB = from.toString();
+    let userB = to.toString();
 
     if (userA > userB) {
       [userA, userB] = [userB, userA];

@@ -43,7 +43,7 @@ export const createPost = async (req, res) => {
       mediaType,
       location,
       tags,
-      visibility: visibility || "pulic",
+      visibility: visibility || "public",
     });
 
     await newPost.save();
