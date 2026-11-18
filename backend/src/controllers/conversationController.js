@@ -57,14 +57,14 @@ export const createConversation = async (req, res) => {
     }
 
     await conversation.populate([
-      { path: "participants.userId", select: "fullName avatarUrl" },
+      { path: "participants.userId", select: "username avatarUrl" },
       {
         path: "seenBy",
-        select: "fullName avatarUrl",
+        select: "username avatarUrl",
       },
       {
         path: "lastMessage.senderId",
-        select: "fullName avatarUrl",
+        select: "username avatarUrl",
       },
     ]);
 
@@ -75,6 +75,75 @@ export const createConversation = async (req, res) => {
   }
 };
 
-export const getConversation = async (req, res) => {};
+export const getConversation = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const conversations = await Conversation.find({
+      "participants.userId": userId,
+    })
+      .sort({ lastMessageAt: -1, updateAt: -1 })
+      .populate({
+        path: "lastMessage.senderId",
+        select: "username avatarUrl",
+      })
+      .populate({
+        path: "seenBy",
+        select: "username avatarUrl",
+      });
 
-export const getMessages = async (req, res) => {};
+    const formatted = conversations.map((convo) => {
+      const participants = (convo.participants || []).map((p) => ({
+        _id: p.userId?._id,
+        username: p.userId?.username,
+        avatarUrl: p.userId?.avatarUrl ?? null,
+        joinedAt: p.joinedAt,
+      }));
+
+      return {
+        ...convo.toObject(),
+        unreadCounts: convo.unreadCounts || {},
+        participants,
+      };
+    });
+
+    return res.status(200).json({ conversations: formatted });
+  } catch (error) {
+    console.error("Lỗi khi lấy conversations", error);
+    return res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
+
+export const getMessages = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const { limit = 50, cursor } = req.query;
+
+    const query = { conversationId };
+
+    if (cursor) {
+      query.createAt = { $lt: new Date(cursor) };
+    }
+
+    let messages = await Message.find(query)
+      .sort({ createdAt: -1 })
+      .limit(Number(limit) + 1);
+
+    let nextCursor = null;
+
+    if (messages.length > Number(limit)) {
+      const nextMessage = messages[messages.length - 1];
+      nextCursor = nextMessage.createdAt.toISOString();
+      messages.pop();
+    }
+
+    messages = messages.reverse();
+
+    return res.status(200).json({
+      messages,
+      nextCursor,
+    });
+  } catch (error) {
+    console.error("Lỗi xảy ra khi lấy messages", error);
+    return res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
