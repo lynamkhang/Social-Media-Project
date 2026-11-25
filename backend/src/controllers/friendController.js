@@ -156,7 +156,7 @@ export const getAllFriends = async (req, res) => {
     }
 
     const friends = friendships.map((f) =>
-      f.userA._id.toString() === userId.toString() ? f.userB : f.userA
+      f.userA._id.toString() === userId.toString() ? f.userB : f.userA,
     );
 
     return res.status(200).json({ friends });
@@ -181,5 +181,114 @@ export const getFriendRequests = async (req, res) => {
   } catch (error) {
     console.log("Error when get friend request", error);
     return res.status(500).json({ message: "System error" });
+  }
+};
+
+export const getFriendSuggestion = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const limit = Number(req.query.limit) || 10;
+
+    // Lấy danh sách bạn và lời mời đang chờ
+    const [friendships, pendingRequests, currentUser] = await Promise.all([
+      Friend.find({ $or: [{ userA: userId }, { userB: userId }] }).lean(),
+      FriendRequest.find({ $or: [{ from: userId }, { to: userId }] }).lean(),
+      User.findById(userId).select("interests location").lean(),
+    ]);
+
+    const myFriendIds = friendships.map((f) =>
+      f.userA.toString() == userId.toString()
+        ? f.userB.toString()
+        : f.userA.toString(),
+    );
+
+    const pendingIds = pendingRequests.map((r) =>
+      r.from.toString() === userId.toString()
+        ? r.to.toString()
+        : r.from.toString(),
+    );
+
+    // Loại ID bản thân + bạn bè + đang chờ kết bạn
+    const excludedIds = new Set([
+      userId.toString(),
+      ...myFriendIds,
+      ...pendingIds,
+    ]);
+
+    // Đếm bạn chung (bậc 2)
+    const mutualMap = new Map();
+    if (myFriendIds.length > 0) {
+      const fofList = await Friend.find({
+        $or: [{ userA: { $in: myFriendIds } }, { userB: { $in: myFriendIds } }],
+      }).lean();
+
+      for (const f of fofList) {
+        const a = f.userA.toString();
+        const b = f.userB.toString();
+        const candidateId = myFriendIds.includes(a) ? b : a;
+
+        if (!excludedIds.has(candidateId)) {
+          mutualMap.set(candidateId, (mutualMap.get(candidateId) || 0) + 1);
+        }
+      }
+    }
+
+    // Lấy ứng viên
+    const candidates = await User.find({
+      _id: { $nin: Array.from(excludedIds) },
+    })
+      .select(
+        "_id username fullName avatarUrl interests location followerCount",
+      )
+      .limit(100)
+      .lean();
+
+    // Chấm điểm: bạn chung > cùng thành phố > sở thích
+    const myCity = currentUser?.location?.city?.toLowerCase();
+    const myInterests = new Set(currentUser?.interests || []);
+
+    const scored = candidates.map((u) => {
+      const mutualFriendsCount = mutualMap.get(u._id.toString()) || 0;
+      const sameCity =
+        myCity && u.location?.city?.toLowerCase() === myCity ? 1 : 0;
+      const commonInterests = (u.interests || []).filter((i) =>
+        myInterests.has(i),
+      ).length;
+
+      const score =
+        mutualFriendsCount * 10 + sameCity * 3 + commonInterests * 2;
+
+      return {
+        _id: u._id,
+        username: u.username,
+        fullName: u.fullName,
+        avatarUrl: u.avatarUrl,
+        mutualFriendsCount,
+        score,
+      };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return res.status(200).json({ suggestions: scored.slice(0, limit) });
+  } catch (error) {
+    console.error("Lỗi khi đề xuất bạn bè:", error);
+    return res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
+
+export const unfriend = async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const { friendId } = req.params;
+    const [userA, userB] =
+      userId < friendId ? [userId, friendId] : [friendId, userId];
+    const deleted = await Friend.findOneAndDelete({ userA, userB });
+    if (!deleted) {
+      return res.status(404).json({ message: "Hai người không phải bạn bè" });
+    }
+    return res.status(200).json({ message: "Đã hủy kết bạn" });
+  } catch (error) {
+    console.error("Lỗi khi hủy kết bạn:", error);
+    return res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
