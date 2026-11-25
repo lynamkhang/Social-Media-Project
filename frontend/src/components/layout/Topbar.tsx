@@ -1,7 +1,11 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
+import { MessageCircle } from "lucide-react";
 import SearchBar from "../ui/searchbar";
+import Signout from "../auth/Signout";
 
 const Topbar = () => {
+  const { pathname } = useLocation();
+
   return (
     <section className="topbar w-full bg-white shadow-sm">
       <div className="flex items-center justify-between py-4 px-5">
@@ -20,19 +24,34 @@ const Topbar = () => {
           </div>
         </div>
 
-        {/* Profile */}
-        <div className="flex items-center justify-end">
+        {/* Navigation Icons */}
+        <div className="flex items-center gap-1">
           <Link
-            to="/profile"
-            className="flex items-center justify-center"
-            title="Profile"
+            to="/chat"
+            className={`p-3 rounded-lg transition-colors ${
+              pathname === "/chat"
+                ? "bg-blue-100 text-blue-600"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
           >
-            <img
-              src="/user.png"
-              alt="Profile"
-              className="w-10 h-10 rounded-full"
-            />
+            <MessageCircle size={24} />
           </Link>
+        </div>
+
+        {/* Profile */}
+        <div className="flex items-center justify-end ml-6">
+          <details className="relative">
+            <summary className="list-none cursor-pointer rounded-full focus-visible:outline-2 focus-visible:outline-blue-600">
+              <img
+                src="/user.png"
+                alt="Profile"
+                className="w-10 h-10 rounded-full"
+              />
+            </summary>
+            <div className="absolute right-0 z-10 mt-2 min-w-36 rounded-md border bg-white p-1 shadow-lg">
+              <Signout />
+            </div>
+          </details>
         </div>
       </div>
     </section>
