@@ -1,3 +1,4 @@
+import { LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
@@ -18,8 +19,9 @@ const Signout = () => {
     <Button
       onClick={handleSignout}
       variant="ghost"
-      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+      className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
     >
+      <LogOut className="size-4" />
       Đăng xuất
     </Button>
   );

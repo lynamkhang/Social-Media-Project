@@ -5,6 +5,7 @@ import ChatPage from "./pages/ChatPage";
 import { Toaster } from "sonner";
 import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Layout from "./components/layout/Layout";
 import Profile from "./pages/Profile";
 
 function App() {
@@ -19,10 +20,11 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           {/* protected routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/chat" element={<ChatPage />} />
-
-            <Route path="/profile" element={<Profile />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

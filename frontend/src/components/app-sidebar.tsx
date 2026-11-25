@@ -22,12 +22,19 @@ const CHAT_FILTERS: { key: ChatFilter; label: string }[] = [
   { key: "group", label: "Nhóm" },
 ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  className,
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [activeFilter, setActiveFilter] = React.useState<ChatFilter>("all");
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar
+      variant="inset"
+      className={`md:top-16 md:h-[calc(100svh-4rem)] ${className ?? ""}`}
+      {...props}
+    >
       {/* Header */}
       <SidebarHeader>
         <SidebarMenu>

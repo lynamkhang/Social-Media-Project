@@ -1,11 +1,7 @@
-//import Signout from "@/components/auth/Signout";
-//import { useAuthStore } from "@/stores/useAuthStore";
-import Layout from "@/components/layout/Layout";
-
 const HomePage = () => {
   return (
-    <div>
-      <Layout />
+    <div className="p-5">
+      HomePage
     </div>
   );
 };
