@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Search, X } from "lucide-react";
 
-import { NavUser } from "@/components/nav-user";
+import { NavUser } from "@/components/ui/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import CreateNewChat from "./chat/CreateNewChat";
+import CreateNewChat from "../chat/CreateNewChat";
 
 type ChatFilter = "all" | "unread" | "group";
 

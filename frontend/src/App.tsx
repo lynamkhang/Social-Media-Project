@@ -4,6 +4,7 @@ import SignupPage from "./pages/SignupPage";
 import ChatPage from "./pages/ChatPage";
 import { Toaster } from "sonner";
 import HomePage from "./pages/HomePage";
+import FriendPage from "./pages/FriendPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Layout from "./components/layout/Layout";
 import Profile from "./pages/Profile";
@@ -22,6 +23,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
               <Route path="/" element={<HomePage />} />
+              <Route path="/friends" element={<FriendPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/profile" element={<Profile />} />
             </Route>

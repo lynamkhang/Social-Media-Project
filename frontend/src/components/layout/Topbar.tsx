@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, House, Users } from "lucide-react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import SearchBar from "../ui/searchbar";
 import Signout from "../auth/Signout";
@@ -29,7 +29,32 @@ const Topbar = () => {
         {/* Navigation Icons */}
         <div className="flex items-center gap-1">
           <Link
+            to="/"
+            title="Trang chủ"
+            className={`p-3 rounded-lg transition-colors ${
+              pathname === "/"
+                ? "bg-blue-100 text-blue-600"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <House size={24} />
+          </Link>
+
+          <Link
+            to="/friends"
+            title="Bạn bè"
+            className={`p-3 rounded-lg transition-colors ${
+              pathname === "/friends"
+                ? "bg-blue-100 text-blue-600"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <Users size={24} />
+          </Link>
+
+          <Link
             to="/chat"
+            title="Tin nhắn"
             className={`p-3 rounded-lg transition-colors ${
               pathname === "/chat"
                 ? "bg-blue-100 text-blue-600"

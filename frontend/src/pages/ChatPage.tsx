@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/ui/app-sidebar"
 import ChatWindowLayout from "@/components/chat/ChatWindowLayout";
 import { SidebarProvider } from "@/components/ui/sidebar"
 
