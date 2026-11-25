@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const postMediaSchema = new mongoose.Schema(
   {
     postId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
       required: true,
       index: true,
     },
@@ -33,5 +34,5 @@ const postMediaSchema = new mongoose.Schema(
 // Index for retrieving media in order
 postMediaSchema.index({ postId: 1, order: 1 });
 
-const PostMedia = new mongoose.model("PostMedia", postMediaSchema);
+const PostMedia = mongoose.model("PostMedia", postMediaSchema);
 export default PostMedia;

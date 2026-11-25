@@ -126,7 +126,7 @@ export const declineFriendRequest = async (req, res) => {
 
     await FriendRequest.findByIdAndDelete(requestId);
 
-    return res.status(204);
+    return res.sendStatus(204);
   } catch (error) {
     console.log("Error when declining friend request", error);
     return res.status(500).json({ message: "System error" });
@@ -170,7 +170,7 @@ export const getFriendRequests = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const populateFields = "_id username fullname avatarUrl";
+    const populateFields = "_id username fullName avatarUrl";
 
     const [sent, received] = await Promise.all([
       FriendRequest.find({ from: userId }).populate("to", populateFields),

@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Follow from "../models/Follow.js";
+import mongoose from "mongoose";
 
 export const authMe = async (req, res) => {
   try {
@@ -17,15 +18,17 @@ export const getUserProfile = async (req, res) => {
     const { identifier } = req.params;
     const currentUserId = req.user._id;
 
-    const user = await User.findOne({
-      $or: [{ username: identifier.toLowerCase() }, { _id: identifier }],
-    }).select("-passwordHash");
+    const query = mongoose.Types.ObjectId.isValid(identifier)
+      ? { $or: [{ username: identifier.toLowerCase() }, { _id: identifier }] }
+      : { username: identifier.toLowerCase() };
+
+    const user = await User.findOne(query).select("-passwordHash");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    isFollowing = await Follow.exists({
+    const isFollowing = await Follow.exists({
       followerId: currentUserId,
       followingId: user._id,
     });

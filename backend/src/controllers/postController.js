@@ -18,14 +18,21 @@ export const createPost = async (req, res) => {
     }
 
     // Upload files to Cloudinary
-    const uploadPromises = req.files.map((file) => {
-      return cloudinary.uploader.upload(file.path, {
-        folder: "social_media_posts",
-        resource_type: "auto",
-      });
-    });
+    let uploadResults = [];
+    if (files.length > 0) {
+      const uploadPromises = files.map((file) =>
+        cloudinary.uploader.upload(file.path, {
+          folder: "social_media_posts",
+          resource_type: "auto",
+        }),
+      );
+      uploadResults = await Promise.all(uploadPromises);
 
-    const uploadResults = await Promise.all(uploadPromises);
+      const fs = await import("fs/promises");
+      await Promise.all(
+        files.map((file) => fs.unlink(file.path).catch(() => {})),
+      );
+    }
 
     // Determine media type
     const mediaTypes = uploadResults.map((result) => result.resource_type);

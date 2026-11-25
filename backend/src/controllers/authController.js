@@ -26,7 +26,7 @@ export const signUp = async (req, res) => {
         message:
           existingUser.email === email
             ? "Email already registered"
-            : "Username already takem",
+            : "Username already taken",
       });
     }
 

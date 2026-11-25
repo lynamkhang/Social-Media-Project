@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const postSchema = new mongoose.Schema(
   {
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
       index: true,
     },
@@ -60,5 +61,5 @@ postSchema.index({ userId: 1, createdAt: -1 });
 postSchema.index({ tags: 1 });
 postSchema.index({ visibility: 1, createdAt: -1 });
 
-const Post = new mongoose.model("Post", postSchema);
+const Post = mongoose.model("Post", postSchema);
 export default Post;
